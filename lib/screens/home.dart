@@ -3,9 +3,14 @@ import 'package:todo_app/constants/colors.dart';
 import 'package:todo_app/widgets/todo_item.dart';
 import "../model/todo.dart";
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
   Home({super.key});
 
+  @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
   final todoList = ToDo.todoList();
 
   @override
@@ -40,6 +45,8 @@ class Home extends StatelessWidget {
                       for (ToDo todoo in todoList)
                         ToDoItem(
                           todo: todoo,
+                          onTodoChanged: _handleTodoChange,
+                          onDeleteItem: _deleteTodoItem,
                         ),
                     ],
                   ),
@@ -106,53 +113,65 @@ class Home extends StatelessWidget {
       ),
     );
   }
-}
 
-AppBar _buildAppBar() {
-  return AppBar(
-    title: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      Icon(
-        Icons.menu,
-        color: tdBlack,
-        size: 30,
-      ),
-      Container(
-        height: 40,
-        width: 40,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(20),
-          child: Image.asset('assets/images/bong.png'),
+  void _handleTodoChange(ToDo todo) {
+    setState(() {
+      todo.isDone = !todo.isDone;
+    });
+  }
+
+  void _deleteTodoItem(String id) {
+    setState(() {
+      todoList.removeWhere((element) => element.id == id);
+    });
+  }
+
+  AppBar _buildAppBar() {
+    return AppBar(
+      title: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+        Icon(
+          Icons.menu,
+          color: tdBlack,
+          size: 30,
         ),
-      )
-    ]),
-    backgroundColor: tdBGColor,
-    elevation: 0,
-  );
-}
+        Container(
+          height: 40,
+          width: 40,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: Image.asset('assets/images/bong.png'),
+          ),
+        )
+      ]),
+      backgroundColor: tdBGColor,
+      elevation: 0,
+    );
+  }
 
-Widget searchBox() {
-  return Container(
-    margin: EdgeInsets.symmetric(horizontal: 15),
-    padding: EdgeInsets.symmetric(horizontal: 5),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(20),
-    ),
-    child: const TextField(
-      decoration: InputDecoration(
-          contentPadding: EdgeInsets.all(5),
-          prefixIcon: Icon(
-            Icons.search,
-            color: tdBlack,
-            size: 20,
-          ),
-          prefixIconConstraints: BoxConstraints(
-            maxHeight: 20,
-            minWidth: 25,
-          ),
-          border: InputBorder.none,
-          hintText: 'Search',
-          hintStyle: TextStyle(color: tdGrey)),
-    ),
-  );
+  Widget searchBox() {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 15),
+      padding: EdgeInsets.symmetric(horizontal: 5),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: const TextField(
+        decoration: InputDecoration(
+            contentPadding: EdgeInsets.all(5),
+            prefixIcon: Icon(
+              Icons.search,
+              color: tdBlack,
+              size: 20,
+            ),
+            prefixIconConstraints: BoxConstraints(
+              maxHeight: 20,
+              minWidth: 25,
+            ),
+            border: InputBorder.none,
+            hintText: 'Search',
+            hintStyle: TextStyle(color: tdGrey)),
+      ),
+    );
+  }
 }
