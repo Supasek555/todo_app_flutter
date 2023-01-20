@@ -12,9 +12,15 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final todoList = ToDo.todoList();
+  List<ToDo> _foundToDo = [];
   final _todoController = TextEditingController();
 
   @override
+  void initState() {
+    _foundToDo = todoList;
+    super.initState();
+  }
+
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: tdBGColor,
@@ -27,6 +33,9 @@ class _HomeState extends State<Home> {
             child: Column(
               children: [
                 searchBox(),
+                Container(
+                  padding: EdgeInsets.symmetric(vertical: 10),
+                ),
                 Expanded(
                   child: ListView(
                     children: [
@@ -43,12 +52,13 @@ class _HomeState extends State<Home> {
                           ),
                         ),
                       ),
-                      for (ToDo todoo in todoList)
+                      for (ToDo todoo in _foundToDo.reversed)
                         ToDoItem(
                           todo: todoo,
                           onTodoChanged: _handleTodoChange,
                           onDeleteItem: _deleteTodoItem,
                         ),
+                      spaceFilling()
                     ],
                   ),
                 )
@@ -130,6 +140,12 @@ class _HomeState extends State<Home> {
     });
   }
 
+  Container spaceFilling() {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 50),
+    );
+  }
+
   void _addToDoItem(String toDoInput) {
     setState(() {
       todoList.add(ToDo(
@@ -139,6 +155,23 @@ class _HomeState extends State<Home> {
     });
 
     _todoController.clear();
+  }
+
+  void _runFilter(String enteredKeyword) {
+    List<ToDo> results = [];
+    if (enteredKeyword.isEmpty) {
+      results = todoList;
+    } else {
+      results = todoList
+          .where((element) => element.todoText!
+              .toLowerCase()
+              .contains(enteredKeyword.toLowerCase()))
+          .toList();
+    }
+
+    setState(() {
+      _foundToDo = results;
+    });
   }
 
   AppBar _buildAppBar() {
@@ -171,7 +204,8 @@ class _HomeState extends State<Home> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
       ),
-      child: const TextField(
+      child: TextField(
+        onChanged: (value) => _runFilter(value),
         decoration: InputDecoration(
             contentPadding: EdgeInsets.all(5),
             prefixIcon: Icon(
